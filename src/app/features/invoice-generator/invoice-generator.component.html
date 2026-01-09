@@ -1,0 +1,200 @@
+<div class="container fade-in">
+  <header class="app-header">
+    <div class="brand">
+      <img src="raseedlogoCropped.png" alt="Raseed Logo" class="app-logo">
+      <div>
+        <h1>Raseed <span class="accent">Free version</span></h1>
+        <p>Professional Invoice Builder</p>
+      </div>
+    </div>
+
+    <div class="actions">
+      <a href="https://www.raseedpro.com" target="_blank" class="btn btn-pro">
+        Explore Raseed PRO &rarr;
+      </a>
+    </div>
+  </header>
+
+  <form [formGroup]="invoiceForm" class="invoice-form">
+
+    <!-- Top Configuration -->
+    <section class="config-bar card">
+      <div class="form-group">
+        <label>Invoice Type</label>
+        <select formControlName="invoiceType">
+          <option *ngFor="let type of invoiceTypes" [value]="type">{{type}} Invoice</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Currency</label>
+        <select formControlName="currency">
+          <option *ngFor="let curr of currencies" [value]="curr">{{curr}}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Issue Date</label>
+        <input type="date" formControlName="issueDate">
+      </div>
+
+      <div class="form-group">
+        <label>Due Date</label>
+        <input type="date" formControlName="dueDate">
+      </div>
+    </section>
+
+    <div class="row">
+      <!-- Seller / From -->
+      <section class="col card" formGroupName="seller">
+        <h3>From (Seller)</h3>
+
+        <!-- Logo Upload -->
+        <div class="logo-upload" (click)="fileInput.click()">
+          <input #fileInput type="file" (change)="onLogoSelected($event)" accept="image/*" hidden>
+          <div class="preview" *ngIf="logoUrl(); else placeholder">
+            <img [src]="logoUrl()" alt="Logo">
+          </div>
+          <ng-template #placeholder>
+            <div class="placeholder-box">
+              <span>+ Upload Logo</span>
+            </div>
+          </ng-template>
+        </div>
+
+        <div class="form-group">
+          <label>Business Name</label>
+          <input formControlName="name" placeholder="Your Business Name">
+        </div>
+
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" formControlName="email" placeholder="your@email.com">
+        </div>
+
+        <div class="form-group">
+          <label>Tax ID / VAT</label>
+          <input formControlName="taxId" placeholder="Tax Registration Number">
+        </div>
+
+        <div formGroupName="address">
+          <input formControlName="line1" placeholder="Address Line 1" class="mb-2">
+          <div class="row-smart">
+            <input formControlName="city" placeholder="City">
+            <input formControlName="postalCode" placeholder="Postal Code">
+          </div>
+          <input formControlName="country" placeholder="Country" class="mt-2">
+        </div>
+      </section>
+
+      <!-- Buyer / To -->
+      <section class="col card" formGroupName="buyer">
+        <h3>Bill To (Client)</h3>
+
+        <div class="form-group">
+          <label>Client Name</label>
+          <input formControlName="name" placeholder="Client / Company Name">
+        </div>
+
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" formControlName="email" placeholder="client@example.com">
+        </div>
+
+        <div class="form-group" *ngIf="invoiceForm.get('invoiceType')?.value === 'Full'">
+          <label>Tax ID / VAT</label>
+          <input formControlName="taxId" placeholder="Client Tax ID (Required for B2B)">
+        </div>
+
+        <div formGroupName="address">
+          <label>Billing Address</label>
+          <input formControlName="line1" placeholder="Address Line 1" class="mb-2">
+          <div class="row-smart">
+            <input formControlName="city" placeholder="City">
+            <input formControlName="postalCode" placeholder="Postal Code">
+          </div>
+          <input formControlName="country" placeholder="Country" class="mt-2">
+        </div>
+      </section>
+    </div>
+
+    <!-- Line Items -->
+    <section class="card full-width mobile-overflow">
+      <div class="section-header">
+        <h3>Items</h3>
+        <button type="button" class="btn btn-secondary sm" (click)="addLineItem()">+ Add Item</button>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="items-table" formArrayName="lineItems">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th width="80">Qty</th>
+              <th width="100">Price</th>
+              <th width="80">Tax %</th>
+              <th width="80">Type</th>
+              <th width="100">Discount</th>
+              <th width="40"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of lineItems.controls; let i=index" [formGroupName]="i">
+              <td><input formControlName="description" placeholder="Item name"></td>
+              <td><input type="number" formControlName="quantity" min="1"></td>
+              <td><input type="number" formControlName="unitPrice" min="0" step="0.01"></td>
+              <td><input type="number" formControlName="taxRate" min="0" step="0.1"></td>
+              <td>
+                <select formControlName="taxType">
+                  <option *ngFor="let t of taxTypes" [value]="t">{{t === 'Inclusive' ? 'Incl' : 'Excl'}}</option>
+                </select>
+              </td>
+              <td><input type="number" formControlName="discount" min="0" step="0.01"></td>
+              <td>
+                <button type="button" class="btn-icon" (click)="removeLineItem(i)"
+                  *ngIf="lineItems.length > 1">&times;</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Totals & Preview -->
+    <section class="totals-section" *ngIf="calculatedInvoice() as inv">
+      <div class="totals-card">
+        <div class="row-between">
+          <span>Subtotal</span>
+          <span>{{inv.subtotal.amount / 100 | currency: inv.subtotal.currency}}</span>
+        </div>
+        <div class="row-between" *ngIf="inv.totalDiscount.amount > 0">
+          <span>Discount</span>
+          <span class="text-danger">- {{inv.totalDiscount.amount / 100 | currency: inv.totalDiscount.currency}}</span>
+        </div>
+        <div class="row-between">
+          <span>Tax</span>
+          <span>{{inv.totalTax.amount / 100 | currency: inv.totalTax.currency}}</span>
+        </div>
+        <div class="divider"></div>
+        <div class="row-between grand-total">
+          <span>Total</span>
+          <span>{{inv.grandTotal.amount / 100 | currency: inv.grandTotal.currency}}</span>
+        </div>
+      </div>
+
+      <div class="actions-footer">
+        <button class="btn btn-primary lg full-mobile" (click)="generatePDF()">
+          Generate Bill
+        </button>
+
+        <div class="error-box" *ngIf="validationErrors().length > 0">
+          <strong>Please fix the following errors:</strong>
+          <ul>
+            <li *ngFor="let err of validationErrors()">{{err}}</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </form>
+</div>
