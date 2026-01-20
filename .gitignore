@@ -45,3 +45,16 @@ Thumbs.db
 .vscode/launch.json
 .vscode/tasks.json
 package-lock.json
+playwright-report/data/6f8a94bb8e7c146111dd568f40bbde72dbc1aa3c.zip
+playwright-report/data/8f08adcdfa2786c6e8bb96814d759e78430a9ff6.zip
+playwright-report/data/64e1ce0c216edf82f3a232e2c6dfec349db27273.zip
+playwright-report/data/697d75e1d866a800c11ec4a69687f18bd3d2e078.zip
+playwright-report/data/866c36400eff968eff07ca241865ad66883aa03e.zip
+playwright-report/data/fe1c41746396831f87cf14c6865816ca459ad142.zip
+test-results/invoice-generator.uat.ts-B-5b1b2-dle-logo-upload-and-removal-webkit/trace.zip
+test-results/invoice-generator.uat.ts-B-89224-termark-if-no-logo-uploaded-webkit/trace.zip
+test-results/invoice-generator.uat.ts-B-db61f--manage-multiple-line-items-webkit/trace.zip
+test-results/invoice-generator.uat.ts-B-dee70-implified-invoice-correctly-webkit/trace.zip
+test-results/invoice-generator.uat.ts-B-e13b8--ID-field-for-Full-Invoices-webkit/trace.zip
+test-results/invoice-generator.uat.ts-B-f263f--errors-on-generate-attempt-webkit/trace.zip
+test_failure.txt

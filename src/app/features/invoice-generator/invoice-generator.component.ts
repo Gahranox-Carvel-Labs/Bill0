@@ -5,11 +5,12 @@
  * Usecase: Users interact with this component to input billing details, add line items, and export professional invoices.
  */
 
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
 import { BillingService } from '../../core/billing.service';
 import { CalculationService } from '../../core/calculation.service';
+import { SeoService } from '../../core/seo.service';
 import { CurrencyCode, InvoiceType, TaxType, Invoice, LineItem, InvoiceStatus } from '../../core/models';
 import { v4 as uuidv4 } from 'uuid';
 import { generateInvoicePDF } from '../../utils/pdf-helper';
@@ -21,10 +22,11 @@ import { generateInvoicePDF } from '../../utils/pdf-helper';
     templateUrl: './invoice-generator.component.html',
     styleUrl: './invoice-generator.component.css'
 })
-export class InvoiceGeneratorComponent {
+export class InvoiceGeneratorComponent implements OnInit {
     private fb = inject(FormBuilder);
     private billingService = inject(BillingService);
     private calculationService = inject(CalculationService);
+    private seoService = inject(SeoService);
 
     invoiceForm: FormGroup;
     logoUrl = signal<string | null>(null);
@@ -82,6 +84,33 @@ export class InvoiceGeneratorComponent {
         this.invoiceForm.valueChanges.subscribe(val => {
             this.recalculate(val);
         });
+    }
+
+    ngOnInit() {
+        const howToSteps = [
+            { name: 'Enter Billing Details', text: 'Fill in your business name, email, and address in the "From" section.' },
+            { name: 'Add Client Information', text: 'Provide the client name and billing address in the "Bill To" section.' },
+            { name: 'Add Line Items', text: 'List the products or services provided, including quantity, price, and tax.' },
+            { name: 'Customize and Download', text: 'Upload your logo, choose currency, and click "Generate Bill" to get your PDF.' }
+        ];
+
+        const faqs = [
+            { question: 'Is Bill0 really free?', answer: 'Yes, the Bill0 free version allows you to generate professional invoices with no hidden costs and no login required.' },
+            { question: 'Do I need to create an account to use Bill0?', answer: 'No, you can start creating invoices immediately without any registration.' },
+            { question: 'Can I add my own logo to the invoice?', answer: 'Absolutely! You can upload your business logo directly in the generator and it will appear on your PDF invoice.' }
+        ];
+
+        this.seoService.setSeoData(
+            'Free Professional Invoice Generator | Bill0',
+            'Create, customize, and download professional invoices for free. No login required. Support for multiple currencies and tax types.',
+            'invoice generator, free billing software, online invoice creator, professional invoice template, Bill0',
+            'SoftwareApplication',
+            'Bill0logoCropped.png',
+            [
+                this.seoService.getHowToSchema(howToSteps),
+                this.seoService.getFAQSchema(faqs)
+            ]
+        );
     }
 
     /**
