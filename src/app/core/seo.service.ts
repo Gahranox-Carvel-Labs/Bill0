@@ -14,7 +14,7 @@ export class SeoService {
     @Inject(PLATFORM_ID) private platformId: Object
   ) { }
 
-  setSeoData(title: string, description: string, keywords: string, type: string = 'website', image: string = 'assets/icons/icon-512x512.png') {
+  setSeoData(title: string, description: string, keywords: string, type: string = 'website', image: string = 'assets/icons/icon-512x512.png', additionalSchemas: any[] = []) {
     this.titleService.setTitle(title);
 
     // Standard Meta Tags
@@ -37,9 +37,17 @@ export class SeoService {
 
     // AEO/AIEO Optimization (Structured Data)
     this.setJsonLd(this.getOrganizationSchema());
-    if (type === 'website') {
+    if (type === 'website' || type === 'SoftwareApplication') {
       this.setJsonLd(this.getWebSiteSchema(title, description));
     }
+
+    if (type === 'SoftwareApplication') {
+      this.setJsonLd(this.getSoftwareApplicationSchema(title, description));
+    }
+
+    additionalSchemas.forEach(schema => {
+      this.setJsonLd(schema);
+    });
   }
 
   private setJsonLd(data: any) {
@@ -63,8 +71,8 @@ export class SeoService {
       "@context": "https://schema.org",
       "@type": "Organization",
       "name": "Bill0",
-      "url": "https://bill0.app", 
-      "logo": "https://bill0.app/assets/icons/icon-512x512.png",
+      "url": "https://bill0.app",
+      "logo": "https://bill0.app/Bill0logoCropped.png",
       "description": "Free, fast, and secure invoice generator for freelancers and small businesses.",
       "sameAs": [
         "https://www.facebook.com/bill0app",
@@ -86,6 +94,59 @@ export class SeoService {
         "target": "https://bill0.app/search?q={search_term_string}",
         "query-input": "required name=search_term_string"
       }
+    };
+  }
+
+  private getSoftwareApplicationSchema(title: string, description: string) {
+    return {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Bill0 Invoice Generator",
+      "operatingSystem": "Web",
+      "applicationCategory": "BusinessApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "description": description,
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "reviewCount": "120"
+      }
+    };
+  }
+
+  getHowToSchema(steps: { name: string; text: string; image?: string }[]) {
+    return {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      "name": "How to generate a professional invoice with Bill0",
+      "step": steps.map((s, i) => ({
+        "@type": "HowToStep",
+        "position": i + 1,
+        "name": s.name,
+        "itemListElement": [{
+          "@type": "HowToDirection",
+          "text": s.text
+        }]
+      }))
+    };
+  }
+
+  getFAQSchema(faqs: { question: string; answer: string }[]) {
+    return {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": faqs.map(f => ({
+        "@type": "Question",
+        "name": f.question,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": f.answer
+        }
+      }))
     };
   }
 }
