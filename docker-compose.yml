@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # Frontend Application
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - bill0-network
+
+  # Backend Services (Placeholders for now)
+  auth-service:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./backend/auth-service:/app
+    command: sh -c "echo 'Auth Service Started' && tail -f /dev/null"
+    networks:
+      - bill0-network
+
+  billing-service:
+    image: oven/bun:1
+    working_dir: /app
+    volumes:
+      - ./backend/billing-service:/app
+    command: sh -c "echo 'Billing Service Started' && tail -f /dev/null"
+    networks:
+      - bill0-network
+
+  llm-service:
+    image: python:3.10-slim
+    working_dir: /app
+    volumes:
+      - ./backend/llm-service:/app
+    command: sh -c "echo 'LLM Service Started' && tail -f /dev/null"
+    networks:
+      - bill0-network
+
+networks:
+  bill0-network:
+    driver: bridge

@@ -10,6 +10,10 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
     {
         path: '',
+        loadComponent: () => import('./features/landing-page/landing-page.component').then(m => m.LandingPageComponent)
+    },
+    {
+        path: 'Bill0free',
         loadComponent: () => import('./features/invoice-generator/invoice-generator.component').then(m => m.InvoiceGeneratorComponent)
     },
     {
